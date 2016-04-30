@@ -1,1 +1,1 @@
-console.log('hello, world!');
+export {default as replaceable} from './replaceable';
