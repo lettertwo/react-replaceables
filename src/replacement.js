@@ -10,7 +10,7 @@ export default class Replacement extends React.Component {
   }
 
   validateReplacement(key) {
-    const invalid = PropTypes.node(this.props, key, this.constructor.name, 'prop');
+    const invalid = PropTypes.func(this.props, key, this.constructor.name, 'prop');
     invariant(!invalid, invalid && invalid.message);
     return this.props[key];
   }
