@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, {Children, PropTypes} from 'react';
 import invariant from 'invariant';
 
 
@@ -28,12 +28,12 @@ export default class Replacement extends React.Component {
   }
 
   render() {
-    return this.props.children;
+    return React.Children.only(this.props.children);
   }
 }
 
 Replacement.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.element.isRequired,
 };
 
 Replacement.contextTypes = {

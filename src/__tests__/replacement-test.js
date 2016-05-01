@@ -51,4 +51,11 @@ describe('<Replacement />', () => {
       shallow(<Replacement test={'test'}><div /></Replacement>);
     }, /Invariant .+ Invalid prop `test`/);
   });
+
+  it('errors with multiple children', () => {
+    assert.throws(() => {
+      shallow(<Replacement><div /><div /></Replacement>);
+    }, /Invariant .+ one child/);
+  });
+
 });
