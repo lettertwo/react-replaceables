@@ -1,11 +1,12 @@
 /* eslint-env mocha */
 import assert from 'power-assert';
-import React from 'react';
+import {shallow, mount} from 'enzyme';
+import React, {PropTypes} from 'react';
 import replaceable from '../replaceable';
 
 const Test = React.createClass({
   displayName: 'TestComponent',
-  render() { return null; },
+  render() { return <span>test</span>; },
 });
 function NamedStateless() {}
 
@@ -37,6 +38,28 @@ describe('replaceable', () => {
     assert.throws(() => replaceable()('tacos'), invariantPattern);
     assert.throws(() => replaceable({}), invariantPattern);
     assert.throws(() => replaceable('tacos'), invariantPattern);
+  });
+
+  it('creates and renders the wrapped element', () => {
+    const ReplaceableTest = replaceable(Test);
+    const wrapper = mount(<ReplaceableTest />);
+    assert(wrapper.text() === 'test');
+  });
+
+  it('creates and renders a replacement React element', () => {
+    const ReplaceableTest = replaceable(Test);
+    const Replacement = React.createClass({
+      propTypes: {children: PropTypes.node},
+      childContextTypes: {componentReplacements: PropTypes.object},
+      getChildContext() {
+        return {componentReplacements: {
+          TestComponent: () => <span>replaced</span>,
+        }};
+      },
+      render() { return this.props.children; },
+    });
+    const wrapper = mount(<Replacement><ReplaceableTest /></Replacement>);
+    assert(wrapper.text() === 'replaced');
   });
 
 });
