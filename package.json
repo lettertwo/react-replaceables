@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Don't theme your components, replace them!",
   "scripts": {
+    "prepublish": "make build",
     "build": "make build",
     "clean": "make clean",
     "test": "make test",
@@ -31,7 +32,7 @@
     "url": "https://github.com/lettertwo/react-replaceables/issues"
   },
   "homepage": "https://github.com/lettertwo/react-replaceables#readme",
-  "main": "./build/index.js",
+  "main": "./dist/index.js",
   "peerDependencies": {
     "react": "~0.14 || ^15"
   },
