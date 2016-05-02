@@ -6,7 +6,9 @@ import replaceable from '../replaceable';
 
 const Test = React.createClass({
   displayName: 'TestComponent',
-  render() { return <span>test</span>; },
+  propTypes: {children: PropTypes.element.isRequired},
+  getDefaultProps() { return {children: <span>test</span>}; },
+  render() { return this.props.children; },
 });
 function NamedStateless() {}
 
@@ -57,25 +59,35 @@ describe('replaceable', () => {
 
   describe('with a replacement', () => {
     const ReplaceableTest = replaceable(Test);
-    const Replacement = React.createClass({
+
+    const ReplacementTest = React.createClass({
+      contextTypes: {replacedComponent: PropTypes.func},
+      render() { return <span>replaced</span>; },
+    });
+
+    const Context = React.createClass({
       propTypes: {children: PropTypes.node},
       childContextTypes: {componentReplacements: PropTypes.object},
       getChildContext() {
-        return {componentReplacements: {
-          TestComponent: () => <span>replaced</span>,
-        }};
+        return {componentReplacements: {TestComponent: ReplacementTest}};
       },
       render() { return this.props.children; },
     });
 
     it('creates and renders a replacement React element', () => {
-      const wrapper = mount(<Replacement><ReplaceableTest /></Replacement>);
+      const wrapper = mount(<Context><ReplaceableTest /></Context>);
       assert(wrapper.text() === 'replaced');
     });
 
     it('forwards props to a replacement element', () => {
-      const wrapper = mount(<Replacement><ReplaceableTest prop="value" /></Replacement>);
+      const wrapper = mount(<Context><ReplaceableTest prop="value" /></Context>);
       assert(wrapper.find(ReplaceableTest).prop('prop') === 'value');
+    });
+
+    it('provides the replaced component in context', () => {
+      const wrapper = mount(<Context><ReplaceableTest /></Context>);
+      const child = wrapper.find(ReplacementTest);
+      assert(child.node.context.replacedComponent === Test);
     });
 
   });
