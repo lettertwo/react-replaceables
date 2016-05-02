@@ -17,23 +17,25 @@ export default function replaceable(Component) {
     ' Give your statelss function component a name or displayName property.'
   );
 
-  return React.createClass({
-    displayName: `${displayName} (replaceable)`,
-    contextTypes: {componentReplacements: PropTypes.object},
-    childContextTypes: {replacedComponent: PropTypes.func},
+  class Replaceable extends React.Component {
     getChildContext() {
       if (this.getReplacement()) {
         return {replacedComponent: Component};
       }
-    },
+    }
     getReplacement() {
       const {componentReplacements = {}} = this.context;
       return componentReplacements[displayName];
-    },
+    }
     render() {
       const ReplacementComponent = this.getReplacement() || Component;
       return <ReplacementComponent {...this.props} />;
-    },
-  });
+    }
+  }
 
+  Replaceable.displayName = `${displayName} (replaceable)`;
+  Replaceable.contextTypes = {componentReplacements: PropTypes.object};
+  Replaceable.childContextTypes = {replacedComponent: PropTypes.func};
+
+  return Replaceable;
 }
