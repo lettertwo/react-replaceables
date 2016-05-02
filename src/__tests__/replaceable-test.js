@@ -40,13 +40,22 @@ describe('replaceable', () => {
     assert.throws(() => replaceable('tacos'), invariantPattern);
   });
 
-  it('creates and renders the wrapped element', () => {
+  describe('without a replacement', () => {
     const ReplaceableTest = replaceable(Test);
-    const wrapper = mount(<ReplaceableTest />);
-    assert(wrapper.text() === 'test');
+
+    it('creates and renders the wrapped element', () => {
+      const wrapper = mount(<ReplaceableTest />);
+      assert(wrapper.text() === 'test');
+    });
+
+    it('forwards props to the wrapped element', () => {
+      const wrapper = mount(<ReplaceableTest prop="value" />);
+      assert(wrapper.prop('prop') === 'value');
+    });
+
   });
 
-  it('creates and renders a replacement React element', () => {
+  describe('with a replacement', () => {
     const ReplaceableTest = replaceable(Test);
     const Replacement = React.createClass({
       propTypes: {children: PropTypes.node},
@@ -58,8 +67,17 @@ describe('replaceable', () => {
       },
       render() { return this.props.children; },
     });
-    const wrapper = mount(<Replacement><ReplaceableTest /></Replacement>);
-    assert(wrapper.text() === 'replaced');
+
+    it('creates and renders a replacement React element', () => {
+      const wrapper = mount(<Replacement><ReplaceableTest /></Replacement>);
+      assert(wrapper.text() === 'replaced');
+    });
+
+    it('forwards props to a replacement element', () => {
+      const wrapper = mount(<Replacement><ReplaceableTest prop="value" /></Replacement>);
+      assert(wrapper.find(ReplaceableTest).prop('prop') === 'value');
+    });
+
   });
 
 });
