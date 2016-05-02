@@ -17,18 +17,18 @@ export default class Replacement extends React.Component {
 
   getComponentReplacements() {
     const {componentReplacements = {}} = this.context;
-    const {children, ...replacements} = this.props;  // eslint-disable-line no-unused-vars
-    return Object.keys(replacements).reduce(
+    return Object.keys(this.props).reduce(
       (m, k) => {
+        if (k === 'children') return m;
         m[k] = this.validateReplacement(k);
         return m;
       },
-      {...componentReplacements},
+      Object.assign({}, componentReplacements)
     );
   }
 
   render() {
-    return React.Children.only(this.props.children);
+    return Children.only(this.props.children);
   }
 }
 
