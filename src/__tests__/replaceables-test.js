@@ -1,10 +1,11 @@
 /* eslint-env mocha */
 import assert from 'power-assert';
-import {shallow, mount} from 'enzyme';
-import React, {PropTypes} from 'react';
-import Replacement, {replaceable, Replacement as ReplacementNamed} from '../index';
+import {mount} from 'enzyme';
+import React from 'react';
+import Replacement, {replaceable, applyDefaultProps, Replacement as ReplacementNamed} from '../index';
 import {default as replaceableActual} from '../replaceable';
 import {default as ReplacementActual} from '../replacement';
+import {default as applyDefaultPropsActual} from '../applyDefaultProps';
 
 
 describe('replaceables', () => {
@@ -19,6 +20,10 @@ describe('replaceables', () => {
 
   it('exports the replaceable decorator', () => {
     assert(replaceable === replaceableActual);
+  });
+
+  it('exports the applyDefaultProps util', () => {
+    assert(applyDefaultProps === applyDefaultPropsActual);
   });
 
   describe('in a rendered component', () => {
