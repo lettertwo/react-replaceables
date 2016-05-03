@@ -17,15 +17,20 @@ describe('replaceable', () => {
   it('allows decorator usage', () => {
     const decorator = replaceable();
     assert(typeof decorator === 'function');
-    assert(typeof decorator.prototype.render === 'undefined');
+    assert(!decorator.prototype || typeof decorator.prototype.render === 'undefined');
     const ReplacedComponent = decorator(Test);
     assert(typeof ReplacedComponent === 'function');
     assert(typeof ReplacedComponent.prototype.render === 'function');
   });
 
   it('displays a nice name for the wrapper component', () => {
-    assert(replaceable(Test, {}).displayName === 'TestComponent (replaceable)');
-    assert(replaceable(NamedStateless, {}).displayName === 'NamedStateless (replaceable)');
+    assert(replaceable(Test).displayName === 'replaceable(TestComponent)');
+    assert(replaceable(NamedStateless).displayName === 'replaceable(NamedStateless)');
+  });
+
+  it('uses a provided name for the wrapper component', () => {
+    assert(replaceable('test', Test).displayName === 'replaceable(test)');
+    assert(replaceable('test')(Test).displayName === 'replaceable(test)');
   });
 
   it('errors with an anonymous component', () => {
@@ -35,11 +40,19 @@ describe('replaceable', () => {
 
   it('errors without a valid React Component', () => {
     const invariantPattern = /Invariant .+ React .+ components/;
+    assert.throws(replaceable('test'), invariantPattern);
+    assert.throws(() => replaceable('test')({}), invariantPattern);
+    assert.throws(() => replaceable('test')('tacos'), invariantPattern);
+    assert.throws(() => replaceable('test', {}), invariantPattern);
     assert.throws(replaceable(), invariantPattern);
-    assert.throws(() => replaceable()({}), invariantPattern);
-    assert.throws(() => replaceable()('tacos'), invariantPattern);
-    assert.throws(() => replaceable({}), invariantPattern);
-    assert.throws(() => replaceable('tacos'), invariantPattern);
+  });
+
+  it('hoists wrapped Component static properties', () => {
+    let C = () => null;
+    C.someStaticProp = 'value';
+    const TestWithStatics = replaceable('C', C);
+    assert('someStaticProp' in TestWithStatics);
+    assert(TestWithStatics.someStaticProp === 'value');
   });
 
   describe('without a replacement', () => {

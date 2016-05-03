@@ -2,10 +2,14 @@
 import assert from 'power-assert';
 import {mount} from 'enzyme';
 import React from 'react';
-import Replacement, {replaceable, applyDefaultProps, Replacement as ReplacementNamed} from '../index';
 import {default as replaceableActual} from '../replaceable';
 import {default as ReplacementActual} from '../replacement';
-import {default as applyDefaultPropsActual} from '../applyDefaultProps';
+import {default as bindDefaultPropsActual} from '../bindDefaultProps';
+import Replacement, {
+  replaceable,
+  bindDefaultProps,
+  Replacement as ReplacementNamed,
+} from '../index';
 
 
 describe('replaceables', () => {
@@ -22,8 +26,8 @@ describe('replaceables', () => {
     assert(replaceable === replaceableActual);
   });
 
-  it('exports the applyDefaultProps util', () => {
-    assert(applyDefaultProps === applyDefaultPropsActual);
+  it('exports the bindDefaultProps util', () => {
+    assert(bindDefaultProps === bindDefaultPropsActual);
   });
 
   describe('in a rendered component', () => {

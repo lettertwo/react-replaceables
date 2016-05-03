@@ -2,11 +2,11 @@
 import assert from 'power-assert';
 import {mount} from 'enzyme';
 import React, {PropTypes} from 'react';
-import applyDefaultProps from '../applyDefaultProps';
+import bindDefaultProps from '../bindDefaultProps';
 
 
-describe('applyDefaultProps', () => {
-  const ReplacedComponent = () => <span>replaced</span>;
+describe('bindDefaultProps', () => {
+  const ReplacedComponent = ({test}) => <span>{test}</span>;  // eslint-disable-line react/prop-types
 
   const Context = React.createClass({
     propTypes: {children: PropTypes.element},
@@ -16,15 +16,15 @@ describe('applyDefaultProps', () => {
   });
 
   it('applies props to the replaced component', () => {
-    const Test = applyDefaultProps({test: 'value'});
+    const Test = bindDefaultProps({test: 'value'});
     const wrapper = mount(<Context><Test /></Context>);
-    assert(wrapper.find(ReplacedComponent).prop('test') === 'value');
+    assert(wrapper.text() === 'value');
   });
 
   it("doesn't clobber props passed in by the parent", () => {
-    const Test = applyDefaultProps({test: 'value'});
+    const Test = bindDefaultProps({test: 'value'});
     const wrapper = mount(<Context><Test test="value2" /></Context>);
-    assert(wrapper.find(ReplacedComponent).prop('test') === 'value2');
+    assert(wrapper.text() === 'value2');
   });
 
 });
