@@ -2,7 +2,7 @@
 import assert from 'power-assert';
 import {shallow, mount} from 'enzyme';
 import React, {PropTypes} from 'react';
-import Replacement from '../replacement';
+import Replacement, {createReplacement} from '../replacement';
 
 describe('<Replacement />', () => {
   let Dummy = () => null;
@@ -56,6 +56,30 @@ describe('<Replacement />', () => {
     assert.throws(() => {
       shallow(<Replacement><div /><div /></Replacement>);
     }, /Invariant .+ one child/);
+  });
+
+});
+
+describe('createReplacement', () => {
+
+  it('creates a Replacement class', () => {
+    const CustomReplacement = createReplacement();
+    assert(typeof CustomReplacement === 'function');
+    assert(typeof CustomReplacement.prototype.render === 'function');
+  });
+
+  it('gives the Replacement class a default displayName', () => {
+    assert(createReplacement().displayName === 'Replacement (custom)');
+  });
+
+  it('uses a displayName provided to the factory', () => {
+    assert(createReplacement({displayName: 'test'}).displayName === 'test');
+  });
+
+  it("errors if component replacements provided to the factory aren't functions", () => {
+    assert.throws(() => {
+      createReplacement({test: 'test'});
+    }, /Invariant .+ Invalid prop `test`/);
   });
 
 });

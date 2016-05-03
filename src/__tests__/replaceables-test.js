@@ -3,11 +3,15 @@ import assert from 'power-assert';
 import {mount} from 'enzyme';
 import React from 'react';
 import {default as replaceableActual} from '../replaceable';
-import {default as ReplacementActual} from '../replacement';
 import {default as bindDefaultPropsActual} from '../bindDefaultProps';
+import {
+  default as ReplacementActual,
+  createReplacement as createReplacementActual,
+} from '../replacement';
 import Replacement, {
   replaceable,
   bindDefaultProps,
+  createReplacement,
   Replacement as ReplacementNamed,
 } from '../index';
 
@@ -28,6 +32,10 @@ describe('replaceables', () => {
 
   it('exports the bindDefaultProps util', () => {
     assert(bindDefaultProps === bindDefaultPropsActual);
+  });
+
+  it('exports the createReplacement factory', () => {
+    assert(createReplacement === createReplacementActual);
   });
 
   describe('in a rendered component', () => {

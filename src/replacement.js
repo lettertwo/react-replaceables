@@ -1,45 +1,62 @@
 import React, {Children, PropTypes} from 'react';
 import invariant from 'invariant';
 
-
-export default class Replacement extends React.Component {
-  getChildContext() {
-    return {
-      componentReplacements: this.getComponentReplacements(),
-    };
-  }
-
-  validateReplacement(key) {
-    const invalid = PropTypes.func(this.props, key, this.constructor.name, 'prop');
-    invariant(!invalid, invalid && invalid.message);
-    return this.props[key];
-  }
-
-  getComponentReplacements() {
-    const {componentReplacements = {}} = this.context;
-    return Object.keys(this.props).reduce(
-      (m, k) => {
-        if (k === 'children') return m;
-        m[k] = this.validateReplacement(k);
-        return m;
-      },
-      Object.assign({}, componentReplacements)
-    );
-  }
-
-  render() {
-    return Children.only(this.props.children);
-  }
+function getValidReplacement(props, key, displayName) {
+  const invalid = PropTypes.func(props, key, displayName, 'prop');
+  invariant(!invalid, invalid && invalid.message);
+  return props[key];
 }
 
-Replacement.propTypes = {
-  children: PropTypes.element.isRequired,
-};
+const blacklist = {children: 1, displayName: 1};
 
-Replacement.contextTypes = {
-  componentReplacements: PropTypes.object,
-};
+function extractReplacements(props, displayName) {
+  return Object.keys(props).reduce((m, k) => {
+    if (blacklist[k]) return m;
+    m[k] = getValidReplacement(props, k, displayName);
+    return m;
+  }, {});
+}
 
-Replacement.childContextTypes = {
-  componentReplacements: PropTypes.object.isRequired,
-};
+
+export function createReplacement(props = {}) {
+
+  class Replacement extends React.Component {
+    getChildContext() {
+      return {
+        componentReplacements: this.getComponentReplacements(),
+      };
+    }
+
+    getComponentReplacements() {
+      const {componentReplacements = {}} = this.context;
+      return Object.assign({},
+        componentReplacements,
+        extractReplacements(this.props, this.constructor.displayName)
+      );
+    }
+
+    render() {
+      return Children.only(this.props.children);
+    }
+  }
+
+  Replacement.displayName = props.displayName || 'Replacement (custom)';
+
+  Replacement.propTypes = {
+    children: PropTypes.element.isRequired,
+  };
+
+  Replacement.defaultProps = extractReplacements(props, Replacement.displayName);
+
+  Replacement.contextTypes = {
+    componentReplacements: PropTypes.object,
+  };
+
+  Replacement.childContextTypes = {
+    componentReplacements: PropTypes.object.isRequired,
+  };
+
+  return Replacement;
+}
+
+export default createReplacement({displayName: 'Replacement'});
