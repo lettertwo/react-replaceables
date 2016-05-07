@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import assert from 'power-assert';
-import {shallow, mount} from 'enzyme';
+import {mount} from 'enzyme';
 import React, {PropTypes} from 'react';
 import replaceable from '../replaceable';
 
@@ -85,6 +85,11 @@ describe('replaceable', () => {
         return {componentReplacements: {TestComponent: ReplacementTest}};
       },
       render() { return this.props.children; },
+    });
+
+    it('wraps the replacement', () => {
+      const wrapper = mount(<Context><ReplaceableTest /></Context>);
+      assert(wrapper.find('replaced(TestComponent)').length === 1);
     });
 
     it('creates and renders a replacement React element', () => {

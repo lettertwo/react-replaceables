@@ -1,13 +1,21 @@
-import {PropTypes} from 'react';
-import compose from 'recompose/compose';
-import getContext from 'recompose/getContext';
-import defaultProps from 'recompose/defaultProps';
-import componentFromProp from 'recompose/componentFromProp';
-
-const replacedContext = {replacedComponent: PropTypes.func.isRequired};
+import React, {PropTypes} from 'react';
 
 
 export default function bindDefaultProps(props) {
-  const enhance = compose(defaultProps(props), getContext(replacedContext));
-  return enhance(componentFromProp('replacedComponent'));
+  class BoundDefaultProps extends React.Component {
+
+    getReplacedComponent() {
+      return this.context.replacedComponent;
+    }
+
+    render() {
+      const ReplacedComponent = this.getReplacedComponent();
+      return <ReplacedComponent {...this.props} />;
+    }
+  }
+
+  BoundDefaultProps.defaultProps = Object.assign({}, props);
+  BoundDefaultProps.contextTypes = {replacedComponent: PropTypes.func.isRequired};
+
+  return BoundDefaultProps;
 }

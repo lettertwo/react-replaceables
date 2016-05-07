@@ -1,49 +1,22 @@
-import {PropTypes} from 'react';
+import React, {PropTypes} from 'react';
 import invariant from 'invariant';
-import compose from 'recompose/compose';
-import withContext from 'recompose/withContext';
-import getContext from 'recompose/getContext';
-import setDisplayName from 'recompose/setDisplayName';
-import componentFromProp from 'recompose/componentFromProp';
-import renderComponent from 'recompose/renderComponent';
-import isClassComponent from 'recompose/isClassComponent';
-import mapProps from 'recompose/mapProps';
-import toClass from 'recompose/toClass';
-import hoistStatics from 'recompose/hoistStatics';
-
-const contextTypes = {componentReplacements: PropTypes.object};
+import hoistNonReactStatics from 'hoist-non-react-statics';
 
 const hasReplacement = (replacements, replacementName) => {
   if (!replacements || typeof replacements !== 'object') return false;
-  return replacementName in replacements;  // eslint-disable-line eqeqeq
+  return replacementName in replacements;
 };
 
 const getReplacement = (replacements, replacementName, DefaultComponent) => {
   if (!hasReplacement(replacements, replacementName)) return DefaultComponent;
-  return replacements[replacementName];
+  return wrapReplacement(replacementName, replacements[replacementName]);
 };
 
-const propsWithReplacement = (replacementName, Component) => (
-  props => Object.keys(props).reduce((p, k) => {
-    if (k === 'componentReplacements') {
-      p.replacementComponent = getReplacement(props[k], replacementName, Component);
-    } else {
-      p[k] = props[k];
-    }
-    return p;
-  }, {})
-);
-
-const replacedContextTypes = {replacedComponent: PropTypes.func};
-
-const replacedContext = (replacementName, Component) => (
-  ({componentReplacements}) => {
-    if (hasReplacement(componentReplacements, replacementName)) {
-      return {replacedComponent: Component};
-    }
-  }
-);
-
+const wrapReplacement = (replacementName, Replacement) => {
+  const wrapper = props => <Replacement {...props} />;
+  wrapper.displayName = `replaced(${replacementName})`;
+  return wrapper;
+};
 
 export default function replaceable(name, Component) {
   if (typeof name === 'string' && Component === undefined) {
@@ -67,14 +40,27 @@ export default function replaceable(name, Component) {
     ' Give your statelss function component a name or displayName property.'
   );
 
-  const enhance = hoistStatics(compose(
-    setDisplayName(`replaceable(${replacementName})`),
-    getContext(contextTypes),
-    withContext(replacedContextTypes, replacedContext(replacementName, Component)),
-    mapProps(propsWithReplacement(replacementName, Component)),
-    renderComponent(componentFromProp('replacementComponent'))
-  ));
 
-  if (isClassComponent(Component)) return toClass(enhance(Component));
-  else return enhance(Component);
+  class Replaceable extends React.Component {
+    getChildContext() {
+      const {componentReplacements} = this.context;
+      if (hasReplacement(componentReplacements, replacementName)) {
+        return {replacedComponent: Component};
+      }
+    }
+
+    render() {
+      const {componentReplacements} = this.context;
+      const Replacement = getReplacement(componentReplacements, replacementName, Component);
+      return <Replacement {...this.props} />;
+    }
+  }
+
+  Replaceable.displayName = `replaceable(${replacementName})`;
+  Replaceable.contextTypes = {componentReplacements: PropTypes.object};
+  Replaceable.childContextTypes = {replacedComponent: PropTypes.func};
+
+  hoistNonReactStatics(Replaceable, Component);
+
+  return Replaceable;
 }
