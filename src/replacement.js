@@ -18,7 +18,17 @@ function extractReplacements(props, displayName) {
 }
 
 
-export function createReplacement(props = {}) {
+export function createReplacement(nameOrProps = {}, props) {
+  let displayName = 'Replacement (custom)';
+  if (typeof nameOrProps === 'string') {
+    displayName = nameOrProps;
+    props = props || {};
+  } else {
+    props = nameOrProps;
+    if (props.displayName) {
+      displayName = props.displayName;
+    }
+  }
 
   class Replacement extends React.Component {
     getChildContext() {
@@ -40,7 +50,7 @@ export function createReplacement(props = {}) {
     }
   }
 
-  Replacement.displayName = props.displayName || 'Replacement (custom)';
+  Replacement.displayName = displayName;
 
   Replacement.propTypes = {
     children: PropTypes.element.isRequired,

@@ -72,8 +72,20 @@ describe('createReplacement', () => {
     assert(createReplacement().displayName === 'Replacement (custom)');
   });
 
-  it('uses a displayName provided to the factory', () => {
+  it('gives the Replacement class a default displayName (with props)', () => {
+    assert(createReplacement({Test: null}).displayName === 'Replacement (custom)');
+  });
+
+  it('uses a displayName prop provided to the factory', () => {
     assert(createReplacement({displayName: 'test'}).displayName === 'test');
+  });
+
+  it('uses a displayName provided to the factory', () => {
+    assert(createReplacement('test').displayName === 'test');
+  });
+
+  it('uses a displayName provided to the factory (with props)', () => {
+    assert(createReplacement('test', {Test: null}).displayName === 'test');
   });
 
   it("errors if component replacements provided to the factory aren't functions", () => {
