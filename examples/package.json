@@ -1,0 +1,23 @@
+{
+  "name": "react-replaceables_examples",
+  "description": "Example use cases for replaceables",
+  "scripts": {
+    "index": "babel-node ./server.js --presets modern-node/5.7,react",
+    "dev-server": "./node_modules/.bin/webpack-dev-server",
+    "start": "npm run index & npm run dev-server"
+  },
+  "author": "Eric Eldredge <lettertwo@gmail.com>",
+  "dependencies": {
+    "babel-cli": "6.8.0",
+    "babel-loader": "6.2.4",
+    "babel-preset-decorators-legacy": "1.0.0",
+    "babel-preset-es2015": "6.6.0",
+    "babel-preset-modern-node": "2.0.0",
+    "babel-preset-react": "6.5.0",
+    "babel-preset-react-hmre": "1.1.1",
+    "react": "15.0.2",
+    "react-dom": "15.0.2",
+    "webpack": "2.1.0-beta.2",
+    "webpack-dev-server": "1.14.1"
+  }
+}
