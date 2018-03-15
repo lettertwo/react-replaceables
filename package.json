@@ -36,7 +36,8 @@
     "url": "https://github.com/lettertwo/react-replaceables/issues"
   },
   "homepage": "https://github.com/lettertwo/react-replaceables#readme",
-  "main": "./dist/index.js",
+  "main": "./umd/index.js",
+  "module": "./esm/index.js",
   "lint-staged": {
     "*.js": [
       "eslint",

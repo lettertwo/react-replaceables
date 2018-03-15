@@ -1,24 +1,24 @@
 TEST_CMD := ./node_modules/.bin/jest
 SRC_DIR := ./src
-DIST_DIR := ./dist
-ES6_DIR := ./es6
-BABEL_CMD := ./node_modules/.bin/babel --ignore '__tests__' $(SRC_DIR)
-BUILD_DIST_CMD :=  $(BABEL_CMD) --presets es2015,react -d $(DIST_DIR)
-BUILD_ES6_CMD := $(BABEL_CMD) --presets react -d $(ES6_DIR)
+UMD_DIR := ./umd
+ESM_DIR := ./esm
+BABEL_CMD := ./node_modules/.bin/babel $(SRC_DIR)
+BUILD_UMD_CMD := BABEL_ENV=umd $(BABEL_CMD) -d $(UMD_DIR)
+BUILD_ESM_CMD := BABEL_ENV=esm $(BABEL_CMD) -d $(ESM_DIR)
 
-$(DIST_DIR): $(shell find ${SRC_DIR} -type f)
-	@$(BUILD_DIST_CMD)
-	@touch $(DIST_DIR)
+$(UMD_DIR): $(shell find ${SRC_DIR} -type f)
+	@$(BUILD_UMD_CMD)
+	@touch $(UMD_DIR)
 
-$(ES6_DIR): $(shell find ${SRC_DIR} -type f)
-	@$(BUILD_ES6_CMD)
-	@touch $(ES6_DIR)
+$(ESM_DIR): $(shell find ${SRC_DIR} -type f)
+	@$(BUILD_ESM_CMD)
+	@touch $(ESM_DIR)
 
-build: $(DIST_DIR) $(ES6_DIR)
+build: $(UMD_DIR) $(ESM_DIR)
 
 clean:
-	@rm -rf $(DIST_DIR)
-	@rm -rf $(ES6_DIR)
+	@rm -rf $(UMD_DIR)
+	@rm -rf $(ESM_DIR)
 
 lint:
 	@./node_modules/.bin/eslint $(SRC_DIR)
