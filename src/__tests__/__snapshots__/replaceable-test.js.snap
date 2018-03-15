@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`replaceable with a replacement creates and renders a replacement React element 1`] = `
+<span>
+  replaced
+</span>
+`;
+
+exports[`replaceable without a replacement creates and renders the wrapped element 1`] = `
+<span>
+  test
+</span>
+`;

@@ -1,113 +1,145 @@
-/* eslint-env mocha */
-import assert from 'power-assert';
-import {mount} from 'enzyme';
-import React, {PropTypes} from 'react';
+/* eslint-env jest */
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import renderer from 'react-test-renderer';
 import replaceable from '../replaceable';
 
-const Test = React.createClass({
-  displayName: 'TestComponent',
-  propTypes: {children: PropTypes.element.isRequired},
-  getDefaultProps() { return {children: <span>test</span>}; },
-  render() { return this.props.children; },
-});
+class Test extends Component {
+  render() {
+    return this.props.children;
+  }
+}
+Test.displayName = 'TestComponent';
+Test.defaultProps = {
+  children: <span>test</span>,
+};
+Test.propTypes = {children: PropTypes.element.isRequired};
+
 function NamedStateless() {}
 
 describe('replaceable', () => {
-
   it('allows decorator usage', () => {
     const decorator = replaceable();
-    assert(typeof decorator === 'function');
-    assert(!decorator.prototype || typeof decorator.prototype.render === 'undefined');
+    expect(typeof decorator).toBe('function');
+    expect(decorator.prototype && decorator.prototype.render).toBeUndefined();
     const ReplacedComponent = decorator(Test);
-    assert(typeof ReplacedComponent === 'function');
-    assert(typeof ReplacedComponent.prototype.render === 'function');
+    expect(typeof ReplacedComponent).toBe('function');
+    expect(typeof ReplacedComponent.prototype.render).toBe('function');
   });
 
   it('displays a nice name for the wrapper component', () => {
-    assert(replaceable(Test).displayName === 'replaceable(TestComponent)');
-    assert(replaceable(NamedStateless).displayName === 'replaceable(NamedStateless)');
+    expect(replaceable(Test).displayName).toBe('replaceable(TestComponent)');
+    expect(replaceable(NamedStateless).displayName).toBe(
+      'replaceable(NamedStateless)'
+    );
   });
 
   it('uses a provided name for the wrapper component', () => {
-    assert(replaceable('test', Test).displayName === 'replaceable(test)');
-    assert(replaceable('test')(Test).displayName === 'replaceable(test)');
+    expect(replaceable('test', Test).displayName).toBe('replaceable(test)');
+    expect(replaceable('test')(Test).displayName).toBe('replaceable(test)');
   });
 
   it('errors with an anonymous component', () => {
-    assert.throws(() => replaceable(() => {}), /Invariant .+ anonymous/);
-    assert.throws(() => replaceable(function() {}), /Invariant .+ anonymous/);
+    const invariantPattern = /Cannot replace an anonymous component!/;
+    expect(() => replaceable(() => {})).toThrow(invariantPattern);
+    expect(() => replaceable(function() {})).toThrow(invariantPattern);
   });
 
   it('errors without a valid React Component', () => {
-    const invariantPattern = /Invariant .+ React .+ components/;
-    assert.throws(replaceable('test'), invariantPattern);
-    assert.throws(() => replaceable('test')({}), invariantPattern);
-    assert.throws(() => replaceable('test')('tacos'), invariantPattern);
-    assert.throws(() => replaceable('test', {}), invariantPattern);
-    assert.throws(replaceable(), invariantPattern);
+    const invariantPattern = /Only React .+ components/;
+    expect(replaceable('test')).toThrow(invariantPattern);
+    expect(() => replaceable('test')({})).toThrow(invariantPattern);
+    expect(() => replaceable('test')('tacos')).toThrow(invariantPattern);
+    expect(() => replaceable('test', {})).toThrow(invariantPattern);
+    expect(replaceable()).toThrow(invariantPattern);
   });
 
   it('hoists wrapped Component static properties', () => {
     let C = () => null;
     C.someStaticProp = 'value';
     const TestWithStatics = replaceable('C', C);
-    assert('someStaticProp' in TestWithStatics);
-    assert(TestWithStatics.someStaticProp === 'value');
+    expect(TestWithStatics).toHaveProperty('someStaticProp');
+    expect(TestWithStatics.someStaticProp).toBe('value');
   });
 
   describe('without a replacement', () => {
     const ReplaceableTest = replaceable(Test);
 
     it('creates and renders the wrapped element', () => {
-      const wrapper = mount(<ReplaceableTest />);
-      assert(wrapper.text() === 'test');
+      const tree = renderer.create(<ReplaceableTest />).toJSON();
+      expect(tree).toMatchSnapshot();
     });
 
     it('forwards props to the wrapped element', () => {
-      const wrapper = mount(<ReplaceableTest prop="value" />);
-      assert(wrapper.prop('prop') === 'value');
+      const tree = renderer.create(<ReplaceableTest prop="value" />);
+      expect(tree.root.findByType(Test).instance.props).toMatchObject({
+        prop: 'value',
+      });
     });
-
   });
 
   describe('with a replacement', () => {
     const ReplaceableTest = replaceable(Test);
 
-    const ReplacementTest = React.createClass({
-      contextTypes: {replacedComponent: PropTypes.func},
-      render() { return <span>replaced</span>; },
-    });
+    class ReplacementTest extends Component {
+      render() {
+        return <span>replaced</span>;
+      }
+    }
+    ReplacementTest.contextTypes = {replacedComponent: PropTypes.func};
 
-    const Context = React.createClass({
-      propTypes: {children: PropTypes.node},
-      childContextTypes: {componentReplacements: PropTypes.object},
+    class Context extends Component {
       getChildContext() {
         return {componentReplacements: {TestComponent: ReplacementTest}};
-      },
-      render() { return this.props.children; },
-    });
+      }
+      render() {
+        return this.props.children;
+      }
+    }
+    Context.propTypes = {children: PropTypes.node};
+    Context.childContextTypes = {componentReplacements: PropTypes.object};
 
     it('wraps the replacement', () => {
-      const wrapper = mount(<Context><ReplaceableTest /></Context>);
-      assert(wrapper.find('replaced(TestComponent)').length === 1);
+      const root = renderer.create(
+        <Context>
+          <ReplaceableTest />
+        </Context>
+      ).root;
+      expect(
+        root.find(({type}) => type.displayName === 'replaced(TestComponent)')
+      ).toBeDefined();
     });
 
     it('creates and renders a replacement React element', () => {
-      const wrapper = mount(<Context><ReplaceableTest /></Context>);
-      assert(wrapper.text() === 'replaced');
+      const tree = renderer
+        .create(
+          <Context>
+            <ReplaceableTest />
+          </Context>
+        )
+        .toJSON();
+      expect(tree).toMatchSnapshot();
     });
 
     it('forwards props to a replacement element', () => {
-      const wrapper = mount(<Context><ReplaceableTest prop="value" /></Context>);
-      assert(wrapper.find(ReplaceableTest).prop('prop') === 'value');
+      const root = renderer.create(
+        <Context>
+          <ReplaceableTest prop="value" />
+        </Context>
+      ).root;
+      expect(root.findByType(ReplaceableTest).instance.props).toMatchObject({
+        prop: 'value',
+      });
     });
 
     it('provides the replaced component in context', () => {
-      const wrapper = mount(<Context><ReplaceableTest /></Context>);
-      const child = wrapper.find(ReplacementTest);
-      assert(child.node.context.replacedComponent === Test);
+      const root = renderer.create(
+        <Context>
+          <ReplaceableTest />
+        </Context>
+      ).root;
+      const child = root.findByType(ReplacementTest).instance;
+      expect(child.context.replacedComponent).toBe(Test);
     });
-
   });
-
 });

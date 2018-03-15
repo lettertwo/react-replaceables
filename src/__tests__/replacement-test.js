@@ -1,97 +1,113 @@
-/* eslint-env mocha */
-import assert from 'power-assert';
-import {shallow, mount} from 'enzyme';
-import React, {PropTypes} from 'react';
+/* eslint-env jest */
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import renderer from 'react-test-renderer';
 import Replacement, {createReplacement} from '../replacement';
 
 describe('<Replacement />', () => {
-  let Dummy = () => null;
+  // let Dummy = () => null;
+  class Dummy extends Component {
+    render() {
+      return null;
+    }
+  }
   Dummy.contextTypes = {componentReplacements: PropTypes.object};
 
   const value = () => 'value';
   const value2 = () => 'value2';
 
   it('provides component replacements in child context', () => {
-    const wrapper = mount(<Replacement test={value}><Dummy /></Replacement>);
-    const child = wrapper.find(Dummy);
-    assert(typeof child.node.context.componentReplacements === 'object');
-    assert(child.node.context.componentReplacements.test === value);
+    const tree = renderer.create(
+      <Replacement test={value}>
+        <Dummy />
+      </Replacement>
+    );
+    const child = tree.root.findByType(Dummy).instance;
+    expect(typeof child.context.componentReplacements).toBe('object');
+    expect(child.context.componentReplacements.test).toBe(value);
   });
 
   it('inherits component replacements from parent context', () => {
-
-    const wrapper = mount(
+    const tree = renderer.create(
       <Replacement test={value}>
         <Replacement test2={value2}>
           <Dummy />
         </Replacement>
       </Replacement>
     );
-    const child = wrapper.find(Dummy);
-    assert(typeof child.node.context.componentReplacements === 'object');
-    assert(child.node.context.componentReplacements.test === value);
-    assert(child.node.context.componentReplacements.test2 === value2);
+    const child = tree.root.findByType(Dummy).instance;
+    expect(typeof child.context.componentReplacements).toBe('object');
+    expect(child.context.componentReplacements.test).toBe(value);
+    expect(child.context.componentReplacements.test2).toBe(value2);
   });
 
   it('overrides inherited component replacements', () => {
-    const wrapper = mount(
+    const tree = renderer.create(
       <Replacement test={value}>
         <Replacement test={value2}>
           <Dummy />
         </Replacement>
       </Replacement>
     );
-    const child = wrapper.find(Dummy);
-    assert(typeof child.node.context.componentReplacements === 'object');
-    assert(child.node.context.componentReplacements.test === value2);
+    const child = tree.root.findByType(Dummy).instance;
+    expect(typeof child.context.componentReplacements).toBe('object');
+    expect(child.context.componentReplacements.test).toBe(value2);
   });
 
   it("errors if component replacements aren't functions", () => {
-    assert.throws(() => {
-      shallow(<Replacement test={'test'}><div /></Replacement>);
-    }, /Invariant .+ Invalid prop `test`/);
+    expect(() => {
+      renderer.create(
+        <Replacement test={'test'}>
+          <div />
+        </Replacement>
+      );
+    }).toThrow(/Invalid prop `test`/);
   });
 
   it('errors with multiple children', () => {
-    assert.throws(() => {
-      shallow(<Replacement><div /><div /></Replacement>);
-    }, /Invariant .+ one child/);
+    expect(() => {
+      renderer.create(
+        <Replacement>
+          <div />
+          <div />
+        </Replacement>
+      );
+    }).toThrow(/React\.Children\.only/);
   });
-
 });
 
 describe('createReplacement', () => {
-
   it('creates a Replacement class', () => {
     const CustomReplacement = createReplacement();
-    assert(typeof CustomReplacement === 'function');
-    assert(typeof CustomReplacement.prototype.render === 'function');
+    expect(typeof CustomReplacement).toBe('function');
+    expect(typeof CustomReplacement.prototype.render).toBe('function');
   });
 
   it('gives the Replacement class a default displayName', () => {
-    assert(createReplacement().displayName === 'Replacement (custom)');
+    expect(createReplacement().displayName).toBe('Replacement (custom)');
   });
 
   it('gives the Replacement class a default displayName (with props)', () => {
-    assert(createReplacement({Test: null}).displayName === 'Replacement (custom)');
+    expect(createReplacement({Test: null}).displayName).toBe(
+      'Replacement (custom)'
+    );
   });
 
   it('uses a displayName prop provided to the factory', () => {
-    assert(createReplacement({displayName: 'test'}).displayName === 'test');
+    expect(createReplacement({displayName: 'test'}).displayName).toBe('test');
   });
 
   it('uses a displayName provided to the factory', () => {
-    assert(createReplacement('test').displayName === 'test');
+    expect(createReplacement('test').displayName).toBe('test');
   });
 
   it('uses a displayName provided to the factory (with props)', () => {
-    assert(createReplacement('test', {Test: null}).displayName === 'test');
+    expect(createReplacement('test', {Test: null}).displayName).toBe('test');
   });
 
   it("errors if component replacements provided to the factory aren't functions", () => {
-    assert.throws(() => {
+    expect(() => {
       createReplacement({test: 'test'});
-    }, /Invariant .+ Invalid prop `test`/);
+    }).toThrow(/Invalid prop `test`/);
   });
-
 });

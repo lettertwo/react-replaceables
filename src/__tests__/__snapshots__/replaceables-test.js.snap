@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`replaceables in a rendered component deeply replaces components 1`] = `
+<div>
+  <span>
+    test
+  </span>
+  <span>
+    decoy
+  </span>
+</div>
+`;
+
+exports[`replaceables in a rendered component shallowly replaces components 1`] = `
+<span>
+  test
+</span>
+`;

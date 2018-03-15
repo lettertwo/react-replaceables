@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`bindDefaultProps applies props to the replaced component 1`] = `
+<span>
+  value
+</span>
+`;
+
+exports[`bindDefaultProps doesn't clobber props passed in by the parent 1`] = `
+<span>
+  value2
+</span>
+`;
