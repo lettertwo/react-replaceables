@@ -103,4 +103,4 @@ bindDefaultProps(props: object): Component
 
 Given a `props` object, returns a React Component that applies those props to a component provided by `context.replacedComponent`.
 
-`bindDefaultProps` is useful for providing different sets of props to select nodes of a deeply nested Component tree. this is a close to 'classic' dependency injection injection as this library gets, though it  is probably not a very good general purpose DI solution, as Compenents must be 'opted in' to injection via a `replaceable` wrapper. It is, however, a good fit for matching themes to themeable Components.
+`bindDefaultProps` is useful for providing different sets of props to select nodes of a deeply nested Component tree. this is a close to 'classic' dependency injection injection as this library gets, though it  is probably not a very good general purpose DI solution, as Components must be 'opted in' to injection via a `replaceable` wrapper. It is, however, a good fit for matching themes to themeable Components.
