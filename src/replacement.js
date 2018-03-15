@@ -1,9 +1,15 @@
-import React, {Children, PropTypes} from 'react';
+import React, {Children} from 'react';
+import PropTypes from 'prop-types';
 import invariant from 'invariant';
 
 function getValidReplacement(props, key, displayName) {
-  const invalid = PropTypes.func(props, key, displayName, 'prop');
-  invariant(!invalid, invalid && invalid.message);
+  const invalid = PropTypes.checkPropTypes(
+    {[key]: PropTypes.func},
+    props,
+    'prop',
+    displayName
+  );
+  invariant(!invalid, (invalid && invalid.message) || 'invalid replacement');
   return props[key];
 }
 
@@ -16,7 +22,6 @@ function extractReplacements(props, displayName) {
     return m;
   }, {});
 }
-
 
 export function createReplacement(nameOrProps = {}, props) {
   let displayName = 'Replacement (custom)';
@@ -39,7 +44,8 @@ export function createReplacement(nameOrProps = {}, props) {
 
     getComponentReplacements() {
       const {componentReplacements = {}} = this.context;
-      return Object.assign({},
+      return Object.assign(
+        {},
         componentReplacements,
         extractReplacements(this.props, this.constructor.displayName)
       );
@@ -56,7 +62,10 @@ export function createReplacement(nameOrProps = {}, props) {
     children: PropTypes.element.isRequired,
   };
 
-  Replacement.defaultProps = extractReplacements(props, Replacement.displayName);
+  Replacement.defaultProps = extractReplacements(
+    props,
+    Replacement.displayName
+  );
 
   Replacement.contextTypes = {
     componentReplacements: PropTypes.object,

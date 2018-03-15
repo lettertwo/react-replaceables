@@ -9,33 +9,28 @@ const Index = (
       <title>Replaceables!</title>
     </head>
     <body>
-      <div id="main">
-      </div>
+      <div id="main" />
     </body>
   </html>
 );
 
-const Example = (props) => (
+const Example = props => (
   <html>
     <head>
       <meta charSet="utf-8" />
       <title>Replaceables!</title>
-      <script src={bundle} charSet="utf-8"></script>
+      <script src={bundle} charSet="utf-8" />
     </head>
     <body>
-      <div id="main">
-      </div>
+      <div id="main" />
     </body>
   </html>
 );
-
-
 
 let app = express();
 
 app.get('/', (req, res) => {
   res.send(`<!DOCTYPE html>\n${renderToStaticMarkup(<Index />)}`);
 });
-
 
 app.listen(9090);

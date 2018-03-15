@@ -1,9 +1,8 @@
-import React, {PropTypes} from 'react';
-
+import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function bindDefaultProps(props) {
   class BoundDefaultProps extends React.Component {
-
     getReplacedComponent() {
       return this.context.replacedComponent;
     }
@@ -15,7 +14,9 @@ export default function bindDefaultProps(props) {
   }
 
   BoundDefaultProps.defaultProps = Object.assign({}, props);
-  BoundDefaultProps.contextTypes = {replacedComponent: PropTypes.func.isRequired};
+  BoundDefaultProps.contextTypes = {
+    replacedComponent: PropTypes.func.isRequired,
+  };
 
   return BoundDefaultProps;
 }

@@ -27,11 +27,7 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel',
         query: {
-          presets: [
-            'decorators-legacy',
-            'react',
-            'react-hmre',
-          ],
+          presets: ['decorators-legacy', 'react', 'react-hmre'],
         },
         exclude: /node_modules/,
       },
@@ -41,7 +37,7 @@ module.exports = {
   devServer: {
     hot: true,
     proxy: {
-      '*': 'http://localhost:9090'
+      '*': 'http://localhost:9090',
     },
     stats: {
       colors: true,

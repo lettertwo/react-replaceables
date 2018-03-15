@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import invariant from 'invariant';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 
@@ -35,11 +36,11 @@ export default function replaceable(name, Component) {
 
   const replacementName = name || Component.displayName || Component.name;
 
-  invariant(replacementName,
+  invariant(
+    replacementName,
     'Cannot replace an anonymous component!' +
-    ' Give your statelss function component a name or displayName property.'
+      ' Give your statelss function component a name or displayName property.'
   );
-
 
   class Replaceable extends React.Component {
     getChildContext() {
@@ -51,7 +52,11 @@ export default function replaceable(name, Component) {
 
     render() {
       const {componentReplacements} = this.context;
-      const Replacement = getReplacement(componentReplacements, replacementName, Component);
+      const Replacement = getReplacement(
+        componentReplacements,
+        replacementName,
+        Component
+      );
       return <Replacement {...this.props} />;
     }
   }
