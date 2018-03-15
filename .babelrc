@@ -1,7 +1,11 @@
 {
   "presets": [
-    "modern-node/5.7",
-    "es2015",
-    "react"
+    "@babel/preset-env",
+    "@babel/preset-flow",
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-object-rest-spread"
   ]
 }

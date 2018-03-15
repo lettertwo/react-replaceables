@@ -1,0 +1,17 @@
+[ignore]
+
+[include]
+
+[libs]
+
+[lints]
+all=error
+sketchy-null-bool=off
+
+[options]
+emoji=true
+
+[strict]
+
+[version]
+^0.68.0

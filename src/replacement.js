@@ -1,3 +1,4 @@
+// @flow
 import React, {Children} from 'react';
 import PropTypes from 'prop-types';
 import invariant from 'invariant';

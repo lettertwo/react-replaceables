@@ -1,3 +1,4 @@
+// @flow
 export {default as replaceable} from './replaceable';
 export {default as bindDefaultProps} from './bindDefaultProps';
 export {

@@ -12,10 +12,18 @@
     }
   },
   "plugins": [
+    "flowtype",
     "prettier"
   ],
+  "settings": {
+    "flowtype": {
+      "onlyFilesWithFlowAnnotation": true
+    }
+  },
   "extends": [
+    "plugin:flowtype/recommended",
     "prettier",
+    "prettier/flowtype",
     "prettier/react"
   ],
   "rules": {
