@@ -1,0 +1,7 @@
+{
+  "presets": [
+    "modern-node/5.7",
+    "es2015",
+    "react"
+  ]
+}

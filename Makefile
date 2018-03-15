@@ -1,5 +1,4 @@
-TEST_CMD := ./node_modules/.bin/mocha --require mocha-bootstrap.js --reporter min
-TEST_PATTERN := './src/**/__tests__/**/*test*.js'
+TEST_CMD := ./node_modules/.bin/jest
 SRC_DIR := ./src
 DIST_DIR := ./dist
 ES6_DIR := ./es6
@@ -25,10 +24,10 @@ lint:
 	@./node_modules/.bin/eslint $(SRC_DIR)
 
 test:
-	@$(TEST_CMD) $(TEST_PATTERN)
+	@$(TEST_CMD)
 
 ci:
-	@$(TEST_CMD) --watch $(TEST_PATTERN)
+	@$(TEST_CMD) --watch
 
 major:
 	npm version major
