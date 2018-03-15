@@ -8,6 +8,10 @@
     "clean": "make clean",
     "test": "make test",
     "ci": "make ci",
+    "test-staged": "jest --bail --findRelatedTests",
+    "lint-staged": "lint-staged",
+    "flow": "flow check",
+    "precommit": "lint-staged",
     "lint": "make lint"
   },
   "repository": {
@@ -33,6 +37,12 @@
   },
   "homepage": "https://github.com/lettertwo/react-replaceables#readme",
   "main": "./dist/index.js",
+  "lint-staged": {
+    "*.js": [
+      "eslint",
+      "test-staged"
+    ]
+  },
   "peerDependencies": {
     "react": "~0.14 || ^15"
   },
